@@ -1,7 +1,4 @@
-canvas {
-    display: inline-block;
+#area {
     width: 98vw;
     height: 95vh;
-    margin-left: 1vw;
-    background-color: black;
 }
