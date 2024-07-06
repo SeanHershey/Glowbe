@@ -1,16 +1,34 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import "./Draw.css";
-
+import React from 'react';
 
 const Canvas = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-
+    const { useState, useEffect } = React
+    const [ticking] = useState(true)
+    const [count, setCount] = useState(0)
+    const [x, setX] = useState(0)
+    const [y, setY] = useState(0)
+    
     useEffect(() => {
+        const update = (e : MouseEvent) => {
+            console.log((e.target as HTMLCanvasElement).id)
+            if (e.target != null &&
+                (e.target as HTMLCanvasElement).id != null &&
+                (e.target as HTMLCanvasElement).id == 'area') {
+                setX(e.offsetX)
+                setY(e.offsetY)
+            }
+        }
+        window.addEventListener('mousemove', update);
+
+        const timer = setTimeout(() => ticking && setCount(count+1), 50)
+
         const canvas = canvasRef.current;
         if (canvas == null) return; 
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        canvas.width = Math.min(window.innerHeight, window.innerWidth);
+        canvas.height = Math.min(window.innerHeight, window.innerWidth);
         
         const gl = canvas.getContext("webgl");
         if (gl == null) return;
@@ -18,10 +36,13 @@ const Canvas = () => {
         // vertex points
         var vertices = [];
 
-        const goldenRatio = 1 + Math.sqrt(5)/4
-        const angle = Math.PI * 2 * goldenRatio
-        const scale = 0.9
-        const number = 10000
+        const goldenRatio = 1 + Math.sqrt(5)/4;
+        const angle = Math.PI * 2 * goldenRatio;
+        const scale = (Math.max(
+                            Math.abs(x - canvas.width/2),
+                            Math.abs(y - canvas.width/2)) 
+                       / canvas.width) * 2;
+        const number = 10000 * scale;
 
         for (let i = 0; i < number; i++) {
             const dist = i / number
@@ -43,7 +64,7 @@ const Canvas = () => {
         attribute vec3 coordinates;
         void main(void) {
             gl_Position = vec4(coordinates, 1.0);
-            gl_PointSize = 2.0;
+            gl_PointSize = `+ scale * 3 +`;
         }`;
         var vertShader = gl.createShader(gl.VERTEX_SHADER);
         if (vertShader == null) return;
@@ -53,7 +74,7 @@ const Canvas = () => {
         // fragment shader
         var fragCode = `
         void main(void) {
-            gl_FragColor = vec4(0, 1, 0, 0.1);
+            gl_FragColor = vec4(0.055, 0.616, 0.333, 0.1);
         }`;
         var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
         if (fragShader == null) return;
@@ -83,7 +104,9 @@ const Canvas = () => {
         // draw points
         gl.drawArrays(gl.POINTS, 0, number);
 
-    }, []);
+        return () => clearTimeout(timer)
+
+    }, [count, ticking, setX, setY]);
 
     return <canvas id="area" ref={canvasRef} />;
 };

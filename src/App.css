@@ -1,4 +1,6 @@
-#area {
-    width: 98vw;
-    height: 95vh;
+.home-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);  
 }

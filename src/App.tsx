@@ -3,7 +3,7 @@ import "./App.css";
 
 export default function App() {
     return (
-        <div id="area" >
+        <div className="home-container">
             <Draw />
         </div>
     );

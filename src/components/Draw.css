@@ -1,7 +1,6 @@
 canvas {
     display: inline-block;
-    width: 98vw;
-    height: 95vh;
+    width: 95Vmin;
+    height: 95Vmin;
     margin-left: 1vw;
-    background-color: black;
 }
